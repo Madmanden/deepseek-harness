@@ -143,6 +143,7 @@ export function CostPeakHeader({ useProjection }: Props): ReactNode {
 
   return (
     <span style={shell} title="Estimated session cost; PEAK follows DeepSeek UTC schedule and is shown for Copenhagen users">
+      <span style={separator} aria-hidden="true">·</span>
       <span aria-label={`Estimated cost ${formatUsd(totalUsd(usage, peak))}`} style={peak ? peakPrice : price}>
         {formatUsd(totalUsd(usage, peak))}
       </span>
