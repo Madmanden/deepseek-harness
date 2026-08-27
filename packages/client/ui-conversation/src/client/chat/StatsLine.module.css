@@ -11,7 +11,7 @@
   min-width: 0;
   /* Start at zero so flex-wrap measures the available row space instead of
      reserving the full max-content stats width before the badge gets a turn. */
-  flex: 1 1 0;
+  flex: 0 1 auto;
   margin: 0;
   box-sizing: border-box;
   padding: 4px calc(var(--dsh-composer-side-clearance) + 16px) 0px;
