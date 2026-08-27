@@ -10,29 +10,27 @@ type Props = PropsRuntime<'conversation.session.header.utilities'>
  * explicit until a settings screen is added.
  */
 const PRICING = {
-  // Official DeepSeek-V4-Flash prices, USD per 1M tokens (Aug 2026).
-  inputPerMillionUsd: 0.14,
-  outputPerMillionUsd: 0.28,
-  cacheReadPerMillionUsd: 0.0028,
+  // Official DeepSeek-V4-Flash off-peak prices, USD per 1M tokens.
+  // DeepSeek's peak rates are exactly 2x these values.
+  inputPerMillionUsd: 0.22,
+  outputPerMillionUsd: 0.66,
+  cacheReadPerMillionUsd: 0.007,
   // DeepSeek's public table lists cache-hit and cache-miss input, not a
   // separately billed cache-write bucket. DSH normally reports this as 0.
   cacheWritePerMillionUsd: 0,
 } as const
 
-/** DeepSeek publishes peak windows in Beijing time (UTC+8). */
-const PEAK_WINDOWS = [
-  { start: 9 * 60, end: 12 * 60 },
-  { start: 14 * 60, end: 18 * 60 },
+/** DeepSeek publishes peak windows in UTC, Monday through Friday. */
+const PEAK_WINDOWS_UTC = [
+  { start: 1 * 60, end: 4 * 60 },
+  { start: 6 * 60, end: 10 * 60 },
 ] as const
 
 function isPeakNow(now = new Date()): boolean {
-  const parts = new Intl.DateTimeFormat('en-GB', {
-    timeZone: 'Asia/Shanghai', hour: '2-digit', minute: '2-digit', hour12: false,
-  }).formatToParts(now)
-  const hour = Number(parts.find(part => part.type === 'hour')?.value ?? 0)
-  const minute = Number(parts.find(part => part.type === 'minute')?.value ?? 0)
-  const current = hour * 60 + minute
-  return PEAK_WINDOWS.some(window => current >= window.start && current < window.end)
+  const weekday = now.getUTCDay()
+  if (weekday === 0 || weekday === 6) return false
+  const current = now.getUTCHours() * 60 + now.getUTCMinutes()
+  return PEAK_WINDOWS_UTC.some(window => current >= window.start && current < window.end)
 }
 
 function totalUsd(usage: SessionProjectionMap['tokenUsage'] | undefined, peak: boolean): number {
@@ -94,7 +92,7 @@ export function CostPeakHeader({ useProjection }: Props): ReactNode {
     : usage.uncachedInputTokens + usage.outputTokens + usage.cacheReadTokens + usage.cacheWriteTokens
 
   return (
-    <span style={shell(peak)} title="Estimated session cost; PEAK follows DeepSeek Beijing time and is shown for Copenhagen users">
+    <span style={shell(peak)} title="Estimated session cost; PEAK follows DeepSeek UTC schedule and is shown for Copenhagen users">
       <span style={dot(peak)} aria-hidden="true" />
       <span style={mode}>{peak ? 'PEAK' : 'OFF-PEAK'}</span>
       <span aria-label={`Estimated cost ${formatUsd(totalUsd(usage, peak))}`} style={price}>
