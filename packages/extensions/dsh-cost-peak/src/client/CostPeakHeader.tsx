@@ -64,15 +64,21 @@ export function nextTariffTransition(now = new Date()): TariffTransition {
   return next
 }
 
-/** Format a tariff transition distance with whole hours and zero-padded minutes. */
-export function formatCountdown(now: Date, transition: TariffTransition): string {
+/** Derive the emphasized duration and un-emphasized tariff label separately. */
+function countdownParts(now: Date, transition: TariffTransition): { duration: string; mode: TariffTransition['mode'] } {
   const totalMinutes = Math.max(0, Math.floor(
     (transition.at.getTime() - now.getTime()) / (60 * 1_000),
   ))
   const hours = Math.floor(totalMinutes / 60)
   const minutes = String(totalMinutes % 60).padStart(2, '0')
   const duration = hours === 0 ? `${totalMinutes}m` : `${hours}t ${minutes}m`
-  return `${duration} til ${transition.mode}`
+  return { duration, mode: transition.mode }
+}
+
+/** Format a tariff transition distance with whole hours and zero-padded minutes. */
+export function formatCountdown(now: Date, transition: TariffTransition): string {
+  const parts = countdownParts(now, transition)
+  return `${parts.duration} til ${parts.mode}`
 }
 
 function totalUsd(usage: SessionProjectionMap['tokenUsage'] | undefined, peak: boolean): number {
@@ -139,6 +145,7 @@ export function CostPeakHeader({ useProjection }: Props): ReactNode {
   }, [])
   const peak = isPeakNow(now)
   const transition = nextTariffTransition(now)
+  const countdown = countdownParts(now, transition)
   const totalTokens = usage === undefined ? 0
     : usage.uncachedInputTokens + usage.outputTokens + usage.cacheReadTokens + usage.cacheWriteTokens
 
@@ -150,9 +157,13 @@ export function CostPeakHeader({ useProjection }: Props): ReactNode {
         {formatUsd(totalUsd(usage, peak))}
       </span>
       <span style={secondLine}>
-        <span style={{ ...tokens, fontWeight: 600 }}>{formatCountdown(now, transition)}</span>
+        <span style={tokens}>
+          <strong>{countdown.duration}</strong> til {countdown.mode}
+        </span>
         <span style={tokens} aria-hidden="true">·</span>
-        <span style={{ ...tokens, fontWeight: 600 }}>{formatTokens(totalTokens)} tokens</span>
+        <span style={tokens}>
+          <strong>{formatTokens(totalTokens)}</strong> tokens
+        </span>
       </span>
     </span>
   )
