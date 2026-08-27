@@ -120,7 +120,7 @@ const mode: CSSProperties = {
 }
 
 const price: CSSProperties = {
-  fontWeight: 600, fontVariantNumeric: 'tabular-nums',
+  marginLeft: 4, fontWeight: 600, fontVariantNumeric: 'tabular-nums',
 }
 
 const tokens: CSSProperties = {
