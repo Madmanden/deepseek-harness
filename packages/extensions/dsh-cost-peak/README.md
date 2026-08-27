@@ -35,5 +35,5 @@ that are not present in the session usage projection. The code intentionally
 keeps pricing local and explicit until a settings screen is added.
 
 DeepSeek currently documents peak windows as 09:00–12:00 and 14:00–18:00
-Beijing time. That is normally 03:00–06:00 and 08:00–12:00 in Copenhagen
-during Danish summer time, and 02:00–05:00 and 07:00–11:00 during winter time.
+Beijing time. The plugin applies those daily windows in UTC, so Copenhagen's
+Danish summer-/wintertime conversion is handled automatically by the browser.
