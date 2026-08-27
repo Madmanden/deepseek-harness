@@ -150,9 +150,9 @@ export function CostPeakHeader({ useProjection }: Props): ReactNode {
         {formatUsd(totalUsd(usage, peak))}
       </span>
       <span style={secondLine}>
-        <span style={tokens}>{formatCountdown(now, transition)}</span>
+        <span style={{ ...tokens, fontWeight: 600 }}>{formatCountdown(now, transition)}</span>
         <span style={tokens} aria-hidden="true">·</span>
-        <span style={tokens}>{formatTokens(totalTokens)} tokens</span>
+        <span style={{ ...tokens, fontWeight: 600 }}>{formatTokens(totalTokens)} tokens</span>
       </span>
     </span>
   )
