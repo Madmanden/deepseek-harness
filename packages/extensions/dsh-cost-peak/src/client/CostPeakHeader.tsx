@@ -10,20 +10,24 @@ type Props = PropsRuntime<'conversation.session.header.utilities'>
  * explicit until a settings screen is added.
  */
 const PRICING = {
-  inputPerMillionUsd: 0,
-  outputPerMillionUsd: 0,
-  cacheReadPerMillionUsd: 0,
+  // Official DeepSeek-V4-Flash prices, USD per 1M tokens (Aug 2026).
+  inputPerMillionUsd: 0.14,
+  outputPerMillionUsd: 0.28,
+  cacheReadPerMillionUsd: 0.0028,
+  // DeepSeek's public table lists cache-hit and cache-miss input, not a
+  // separately billed cache-write bucket. DSH normally reports this as 0.
   cacheWritePerMillionUsd: 0,
 } as const
 
-/** Copenhagen local-time windows. Change these to your provider's tariff. */
+/** DeepSeek publishes peak windows in Beijing time (UTC+8). */
 const PEAK_WINDOWS = [
-  { start: 8 * 60, end: 18 * 60 },
+  { start: 9 * 60, end: 12 * 60 },
+  { start: 14 * 60, end: 18 * 60 },
 ] as const
 
 function isPeakNow(now = new Date()): boolean {
   const parts = new Intl.DateTimeFormat('en-GB', {
-    timeZone: 'Europe/Copenhagen', hour: '2-digit', minute: '2-digit', hour12: false,
+    timeZone: 'Asia/Shanghai', hour: '2-digit', minute: '2-digit', hour12: false,
   }).formatToParts(now)
   const hour = Number(parts.find(part => part.type === 'hour')?.value ?? 0)
   const minute = Number(parts.find(part => part.type === 'minute')?.value ?? 0)
@@ -70,7 +74,7 @@ export function CostPeakHeader({ useProjection }: Props): ReactNode {
     : usage.uncachedInputTokens + usage.outputTokens + usage.cacheReadTokens + usage.cacheWriteTokens
 
   return (
-    <span style={shell} title="Estimated session cost; edit PRICING in the plugin source">
+    <span style={shell} title="Estimated session cost; PEAK follows DeepSeek Beijing time and is shown for Copenhagen users">
       <span style={dot(peak)} aria-hidden="true" />
       <span>{peak ? 'PEAK' : 'OFF-PEAK'}</span>
       <span aria-label={`Estimated cost ${formatUsd(totalUsd(usage))}`}>
