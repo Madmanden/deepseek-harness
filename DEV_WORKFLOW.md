@@ -87,3 +87,23 @@ git status --short --branch
 ```
 
 Commit kun de tilsigtede ændringer, og kontrollér efterfølgende at checkoutet stadig bruger samme branch og working tree som den lokale `dsh-local`-proces.
+
+## Hent nyeste Harness uden at miste pluginet
+
+`origin` er vores fork (`Madmanden/deepseek-harness`), mens `upstream` er det officielle repository (`deepseek-ai/deepseek-harness`). Pluginet er committed i vores fork under `packages/extensions/dsh-cost-peak` og bliver derfor normalt bevaret ved en upstream-merge.
+
+Opdatér lokalt:
+
+```sh
+cd /Users/christian/Documents/dev/deepseek-harness
+git fetch upstream
+git switch master
+git merge upstream/master
+pnpm install
+pnpm run build
+git push origin master
+```
+
+Hvis upstream har ændret de samme UI-filer som pluginet eller footer-tilpasningen, stopper merge med en konflikt. Løs konflikten, kør tests og build, og afslut derefter med `git add ...`, `git commit` og `git push origin master`. Pluginet bliver ikke automatisk overskrevet af filer, som upstream ikke ændrer.
+
+Efter en opdatering startes live-workflowet igen med `dsh-local --no-open`. Den lokale profil under `$DSH_HOME` peger på checkoutet og bygger derfor den version af Harness, der nu ligger i vores fork, sammen med pluginet.
