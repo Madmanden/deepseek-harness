@@ -56,15 +56,32 @@ function formatTokens(value: number): string {
   return `${(value / 1_000_000).toFixed(2)}M`
 }
 
-const shell: CSSProperties = {
-  display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 11,
-  color: 'var(--dsw-text-muted, #667085)', whiteSpace: 'nowrap',
-}
+const shell = (peak: boolean): CSSProperties => ({
+  display: 'inline-flex', alignItems: 'center', gap: 7,
+  minHeight: 34, padding: '5px 10px', borderRadius: 9,
+  border: `1px solid ${peak ? 'rgba(245, 158, 11, 0.38)' : 'rgba(52, 211, 153, 0.26)'}`,
+  background: peak ? 'rgba(245, 158, 11, 0.12)' : 'rgba(52, 211, 153, 0.08)',
+  color: 'var(--dsw-text, #f2f4f7)', whiteSpace: 'nowrap',
+})
 
 const dot = (peak: boolean): CSSProperties => ({
-  width: 6, height: 6, borderRadius: '50%', display: 'inline-block',
+  width: 8, height: 8, borderRadius: '50%', display: 'inline-block', flex: '0 0 auto',
   background: peak ? '#d97706' : '#16a34a',
+  boxShadow: `0 0 0 3px ${peak ? 'rgba(245, 158, 11, 0.16)' : 'rgba(52, 211, 153, 0.14)'}`,
 })
+
+const mode: CSSProperties = {
+  fontSize: 12, fontWeight: 700, letterSpacing: '0.02em',
+}
+
+const price: CSSProperties = {
+  fontSize: 14, fontWeight: 700, fontVariantNumeric: 'tabular-nums',
+}
+
+const tokens: CSSProperties = {
+  fontSize: 11, color: 'var(--dsw-text-muted, #98a2b3)',
+  fontVariantNumeric: 'tabular-nums',
+}
 
 export function CostPeakHeader({ useProjection }: Props): ReactNode {
   const usage = useProjection('tokenUsage')
@@ -77,12 +94,13 @@ export function CostPeakHeader({ useProjection }: Props): ReactNode {
     : usage.uncachedInputTokens + usage.outputTokens + usage.cacheReadTokens + usage.cacheWriteTokens
 
   return (
-    <span style={shell} title="Estimated session cost; PEAK follows DeepSeek Beijing time and is shown for Copenhagen users">
+    <span style={shell(peak)} title="Estimated session cost; PEAK follows DeepSeek Beijing time and is shown for Copenhagen users">
       <span style={dot(peak)} aria-hidden="true" />
-      <span>{peak ? 'PEAK' : 'OFF-PEAK'}</span>
-      <span aria-label={`Estimated cost ${formatUsd(totalUsd(usage, peak))}`}>
-        {formatUsd(totalUsd(usage, peak))} · {formatTokens(totalTokens)} tokens
+      <span style={mode}>{peak ? 'PEAK' : 'OFF-PEAK'}</span>
+      <span aria-label={`Estimated cost ${formatUsd(totalUsd(usage, peak))}`} style={price}>
+        {formatUsd(totalUsd(usage, peak))}
       </span>
+      <span style={tokens}>{formatTokens(totalTokens)} tokens</span>
     </span>
   )
 }
