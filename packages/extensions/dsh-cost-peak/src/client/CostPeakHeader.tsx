@@ -104,19 +104,10 @@ function formatTokens(value: number): string {
   return `${(value / 1_000_000).toFixed(2)}M`
 }
 
-const shell = (peak: boolean): CSSProperties => ({
-  display: 'inline-flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2,
-  minHeight: 30, padding: '5px 8px', borderRadius: 8,
-  border: `1px solid ${peak ? 'rgba(245, 158, 11, 0.38)' : 'rgba(52, 211, 153, 0.26)'}`,
-  background: peak ? 'rgba(245, 158, 11, 0.12)' : 'rgba(52, 211, 153, 0.08)',
-  color: 'var(--dsw-text, #f2f4f7)', whiteSpace: 'nowrap',
-})
-
-const dot = (peak: boolean): CSSProperties => ({
-  width: 7, height: 7, borderRadius: '50%', display: 'inline-block', flex: '0 0 auto',
-  background: peak ? '#d97706' : '#16a34a',
-  boxShadow: `0 0 0 2px ${peak ? 'rgba(245, 158, 11, 0.16)' : 'rgba(52, 211, 153, 0.14)'}`,
-})
+const shell: CSSProperties = {
+  display: 'inline-flex', alignItems: 'center', gap: 7,
+  minWidth: 0, color: 'var(--dsw-text-muted, #98a2b3)', whiteSpace: 'nowrap',
+}
 
 const mode: CSSProperties = {
   fontSize: 11, fontWeight: 700, letterSpacing: '0.02em',
@@ -129,15 +120,6 @@ const price: CSSProperties = {
 const tokens: CSSProperties = {
   fontSize: 10, color: 'var(--dsw-text-muted, #98a2b3)',
   fontVariantNumeric: 'tabular-nums',
-}
-
-const secondLine: CSSProperties = {
-  display: 'inline-flex', alignItems: 'center',
-  justifyContent: 'center', gap: 7,
-}
-
-const firstLine: CSSProperties = {
-  display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 7,
 }
 
 export function CostPeakHeader({ useProjection }: Props): ReactNode {
@@ -154,22 +136,18 @@ export function CostPeakHeader({ useProjection }: Props): ReactNode {
     : usage.uncachedInputTokens + usage.outputTokens + usage.cacheReadTokens + usage.cacheWriteTokens
 
   return (
-    <span style={shell(peak)} title="Estimated session cost; PEAK follows DeepSeek UTC schedule and is shown for Copenhagen users">
-      <span style={firstLine}>
-        <span style={dot(peak)} aria-hidden="true" />
-        <span style={mode}>{peak ? 'PEAK' : 'OFF-PEAK'}</span>
-        <span aria-label={`Estimated cost ${formatUsd(totalUsd(usage, peak))}`} style={price}>
-          {formatUsd(totalUsd(usage, peak))}
-        </span>
+    <span style={shell} title="Estimated session cost; PEAK follows DeepSeek UTC schedule and is shown for Copenhagen users">
+      <span aria-hidden="true">·</span>
+      <span style={mode}>{peak ? 'PEAK' : 'OFF-PEAK'}</span>
+      <span aria-label={`Estimated cost ${formatUsd(totalUsd(usage, peak))}`} style={price}>
+        {formatUsd(totalUsd(usage, peak))}
       </span>
-      <span style={secondLine}>
-        <span style={tokens}>
-          <strong>{countdown.duration}</strong> til {countdown.mode}
-        </span>
-        <span style={tokens} aria-hidden="true">·</span>
-        <span style={tokens}>
-          <strong>{formatTokens(totalTokens)}</strong> tokens
-        </span>
+      <span style={tokens}>
+        <strong>{countdown.duration}</strong> til {countdown.mode}
+      </span>
+      <span style={tokens} aria-hidden="true">·</span>
+      <span style={tokens}>
+        <strong>{formatTokens(totalTokens)}</strong> tokens
       </span>
     </span>
   )
