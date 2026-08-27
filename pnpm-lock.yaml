@@ -4279,6 +4279,30 @@ importers:
         specifier: workspace:^
         version: link:../../typert/protocol
 
+  packages/extensions/dsh-cost-peak:
+    devDependencies:
+      '@deepseek-ai/cordis':
+        specifier: workspace:^
+        version: link:../../../vendor/cordis
+      '@deepseek-ai/dsh-client-runtime':
+        specifier: workspace:^
+        version: link:../../client/runtime
+      '@deepseek-ai/dsh-client-ui-conversation':
+        specifier: workspace:^
+        version: link:../../client/ui-conversation
+      '@deepseek-ai/dsh-client-ui-slots':
+        specifier: workspace:^
+        version: link:../../client/ui-slots
+      '@deepseek-ai/dsh-token-meter':
+        specifier: workspace:^
+        version: link:../../llm/token-meter
+      '@types/react':
+        specifier: ~18.3.1
+        version: 18.3.31
+      react:
+        specifier: ^18.2.0
+        version: 18.3.1
+
   packages/extensions/tool-cordis:
     devDependencies:
       '@deepseek-ai/cordis':
