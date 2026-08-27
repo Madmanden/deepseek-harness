@@ -125,8 +125,9 @@ const tokens: CSSProperties = {
   fontVariantNumeric: 'tabular-nums',
 }
 
-const countdown: CSSProperties = {
-  flex: '0 0 100%', textAlign: 'center',
+const secondLine: CSSProperties = {
+  flex: '0 0 100%', display: 'inline-flex', alignItems: 'center',
+  justifyContent: 'center', gap: 7,
 }
 
 export function CostPeakHeader({ useProjection }: Props): ReactNode {
@@ -148,9 +149,11 @@ export function CostPeakHeader({ useProjection }: Props): ReactNode {
       <span aria-label={`Estimated cost ${formatUsd(totalUsd(usage, peak))}`} style={price}>
         {formatUsd(totalUsd(usage, peak))}
       </span>
-      <span style={{ ...tokens, ...countdown }}>{formatCountdown(now, transition)}</span>
-      <span style={tokens} aria-hidden="true">·</span>
-      <span style={tokens}>{formatTokens(totalTokens)} tokens</span>
+      <span style={secondLine}>
+        <span style={tokens}>{formatCountdown(now, transition)}</span>
+        <span style={tokens} aria-hidden="true">·</span>
+        <span style={tokens}>{formatTokens(totalTokens)} tokens</span>
+      </span>
     </span>
   )
 }
