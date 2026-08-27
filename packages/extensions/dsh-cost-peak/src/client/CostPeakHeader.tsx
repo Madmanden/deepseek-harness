@@ -105,7 +105,7 @@ function formatTokens(value: number): string {
 }
 
 const shell = (peak: boolean): CSSProperties => ({
-  display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '2px 7px',
+  display: 'inline-flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2,
   minHeight: 30, padding: '5px 8px', borderRadius: 8,
   border: `1px solid ${peak ? 'rgba(245, 158, 11, 0.38)' : 'rgba(52, 211, 153, 0.26)'}`,
   background: peak ? 'rgba(245, 158, 11, 0.12)' : 'rgba(52, 211, 153, 0.08)',
@@ -132,8 +132,12 @@ const tokens: CSSProperties = {
 }
 
 const secondLine: CSSProperties = {
-  flex: '0 0 100%', display: 'inline-flex', alignItems: 'center',
+  display: 'inline-flex', alignItems: 'center',
   justifyContent: 'center', gap: 7,
+}
+
+const firstLine: CSSProperties = {
+  display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 7,
 }
 
 export function CostPeakHeader({ useProjection }: Props): ReactNode {
@@ -150,11 +154,13 @@ export function CostPeakHeader({ useProjection }: Props): ReactNode {
     : usage.uncachedInputTokens + usage.outputTokens + usage.cacheReadTokens + usage.cacheWriteTokens
 
   return (
-    <span style={{ ...shell(peak), flexWrap: 'wrap' }} title="Estimated session cost; PEAK follows DeepSeek UTC schedule and is shown for Copenhagen users">
-      <span style={dot(peak)} aria-hidden="true" />
-      <span style={mode}>{peak ? 'PEAK' : 'OFF-PEAK'}</span>
-      <span aria-label={`Estimated cost ${formatUsd(totalUsd(usage, peak))}`} style={price}>
-        {formatUsd(totalUsd(usage, peak))}
+    <span style={shell(peak)} title="Estimated session cost; PEAK follows DeepSeek UTC schedule and is shown for Copenhagen users">
+      <span style={firstLine}>
+        <span style={dot(peak)} aria-hidden="true" />
+        <span style={mode}>{peak ? 'PEAK' : 'OFF-PEAK'}</span>
+        <span aria-label={`Estimated cost ${formatUsd(totalUsd(usage, peak))}`} style={price}>
+          {formatUsd(totalUsd(usage, peak))}
+        </span>
       </span>
       <span style={secondLine}>
         <span style={tokens}>
