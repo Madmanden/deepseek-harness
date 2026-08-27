@@ -4,10 +4,10 @@
 .root {
   /* Block, not flex: text-overflow only elides a block's inline content, so
      an overlong line ends in … instead of a mid-glyph clip. */
-  display: block;
+  display: inline-block;
   text-align: center;
   max-width: var(--dsh-chat-content-width);
-  width: auto;
+  width: max-content;
   min-width: 0;
   /* Start at zero so flex-wrap measures the available row space instead of
      reserving the full max-content stats width before the badge gets a turn. */

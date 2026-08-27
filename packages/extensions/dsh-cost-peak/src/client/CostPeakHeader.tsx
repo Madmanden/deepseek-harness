@@ -106,7 +106,8 @@ function formatTokens(value: number): string {
 
 const shell: CSSProperties = {
   display: 'inline-flex', alignItems: 'center', gap: 0,
-  minWidth: 0, color: 'var(--dsw-alias-label-tertiary)',
+  minWidth: 0, paddingTop: 4, boxSizing: 'border-box',
+  color: 'var(--dsw-alias-label-tertiary)',
   fontSize: 12, lineHeight: '20px', whiteSpace: 'nowrap',
 }
 
