@@ -1,8 +1,6 @@
 # Lokal udviklingsworkflow for DeepSeek Harness
 
-Dette er den anbefalede workflow for den lokale Web UI med `dsh-cost-peak`.
-Den vigtige detalje er, at både plugin-bundlen og runtime-profilen skal komme
-fra dette checkout.
+Dette er den anbefalede workflow for den lokale Web UI med `dsh-cost-peak`. Den vigtige detalje er, at både plugin-bundlen og runtime-profilen skal komme fra dette checkout.
 
 ## Start den lokale UI
 
@@ -19,11 +17,15 @@ dsh-local --no-open
 
 1. Skifter til `/Users/christian/Documents/dev/deepseek-harness`.
 2. Sætter `DSH_HOME=/Users/christian/.dsh`.
-3. Bygger `dsh-cost-peak`-pluginet.
-4. Starter Web UI med `--profile web` på port `3098`.
+3. Kører en komplet initial build.
+4. Starter `pnpm run dev:web`, som watcher alle klientbundles med polling.
+5. Starter Web UI med `--profile web` på port `3098`.
 
-Hvis funktionen ikke findes i shellen, skal den først genindlæses med
-`source /Users/christian/.zshrc`. Den nuværende funktion er defineret dér.
+Det er kombinationen af `pnpm run dev:web` og `dsh web`, der giver live
+opdateringer. Watcheren skriver nye bundles, mens Web UI'ens HMR-modtager
+opdager dem og genindlæser det berørte plugin i den åbne browser.
+
+Hvis funktionen ikke findes i shellen, skal den først genindlæses med `source /Users/christian/.zshrc`. Den nuværende funktion er defineret dér.
 
 ## Profilen skal pege på checkoutet
 
@@ -43,30 +45,27 @@ ls -l /Users/christian/.dsh/profiles/web/node_modules/dsh-cost-peak
 rg -n 'dsh-cost-peak' /Users/christian/.dsh/profiles/web/package.json
 ```
 
-Undgå at starte med en nøgen `pnpm dsh --profile web`, hvis `DSH_HOME` ikke er
-sat. Den kan bruge en anden profil under `.codex2/.dsh` og dermed vise en gammel
-plugin-bundle, selv om kildekoden i checkoutet er opdateret.
+Undgå at starte med en nøgen `pnpm dsh --profile web`, hvis `DSH_HOME` ikke er sat. Den kan bruge en anden profil under `.codex2/.dsh` og dermed vise en gammel plugin-bundle, selv om kildekoden i checkoutet er opdateret.
 
 ## Når kildekoden ændres
 
-For ændringer i `packages/extensions/dsh-cost-peak`:
+Med `dsh-local` kørende skal du normalt kun gemme filen. Watcheren bygger den ændrede bundle, og HMR opdaterer siden. Browseren behøver kun en manuel refresh, hvis en ændring påvirker shellens statiske Web-build eller hvis HMR rapporterer en fejl.
 
-```sh
-cd /Users/christian/Documents/dev/deepseek-harness
-pnpm --filter dsh-cost-peak bundle
-```
-
-For ændringer i klientpakker som `packages/client/ui-conversation` skal hele
-builden køres, så de genererede `lib/`-filer også er opdaterede:
+Hvis processerne startes manuelt i to shells, kør først dette fra repo-roden:
 
 ```sh
 pnpm run build
+pnpm run dev:web
 ```
 
-Genindlæs derefter browseren. Hvis den kørende proces stadig serverer den gamle
-bundle, stop den med `Ctrl-C` og start `dsh-local --no-open` igen. Plugin-moduler
-indlæses ved processtart; en browser-refresh alene kan derfor ikke altid hente
-en ny plugin-bundle.
+Start derefter i en anden shell:
+
+```sh
+source /Users/christian/.zshrc
+DSH_HOME=/Users/christian/.dsh pnpm dsh --profile web --port 3098 --no-open
+```
+
+Stop begge processer med `Ctrl-C`. Kør ikke `pnpm run build` samtidig med `pnpm run dev:web`, da de skriver til de samme `lib/`- og `dist/`-mapper.
 
 ## Relevante checks
 
@@ -87,5 +86,4 @@ git diff --check
 git status --short --branch
 ```
 
-Commit kun de tilsigtede ændringer, og kontrollér efterfølgende at checkoutet
-stadig bruger samme branch og working tree som den lokale `dsh-local`-proces.
+Commit kun de tilsigtede ændringer, og kontrollér efterfølgende at checkoutet stadig bruger samme branch og working tree som den lokale `dsh-local`-proces.
