@@ -19,6 +19,18 @@
   padding: 0 var(--dsh-composer-side-clearance) 8px;
 }
 
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 4px 12px;
+  width: 100%;
+  max-width: var(--dsh-composer-card-max-width);
+  min-width: 0;
+  box-sizing: border-box;
+}
+
 .hero {
   /* No bottom pad in the centered hero, but the side clearance must survive:
      the hero wrapper is full-width on narrow viewports, so this padding is

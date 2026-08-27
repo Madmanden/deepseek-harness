@@ -1,11 +1,12 @@
 # dsh-cost-peak
 
-Small local plugin for DeepSeek Harness. It adds a session-header utility with:
+Small local plugin for DeepSeek Harness. It adds a composer-footer utility with:
 
 - cumulative provider-reported token usage from DSH's existing `tokenUsage` projection
 - an estimated USD session cost
 - `PEAK` / `OFF-PEAK` based on DeepSeek's published Beijing windows, converted
   automatically for Copenhagen users through timezone-aware formatting
+- a countdown to the next tariff transition from DeepSeek's UTC schedule
 
 During `PEAK`, the displayed estimate applies the 2x tariff multiplier.
 

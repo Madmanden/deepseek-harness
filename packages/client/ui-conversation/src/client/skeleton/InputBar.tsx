@@ -832,7 +832,7 @@ export function InputBar({
           </div>
         </div>
       </div>
-      {footer}
+      {footer !== undefined && <div className={css.footer}>{footer}</div>}
     </div>
   )
 }
