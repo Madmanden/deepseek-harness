@@ -150,11 +150,11 @@ export function CostPeakHeader({ useProjection }: Props): ReactNode {
       </span>
       <span style={separator} aria-hidden="true">·</span>
       <span style={tokens}>
-        <strong>{countdown.duration}</strong> til {countdown.mode}
+        {countdown.duration} til {countdown.mode}
       </span>
       <span style={separator} aria-hidden="true">·</span>
       <span style={tokens}>
-        <strong>{formatTokens(totalTokens)}</strong> tokens
+        {formatTokens(totalTokens)} tokens
       </span>
     </span>
   )
