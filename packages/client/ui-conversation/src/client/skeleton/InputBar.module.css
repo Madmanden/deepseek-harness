@@ -24,7 +24,7 @@
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  gap: 4px 12px;
+  gap: 4px 0;
   width: 100%;
   max-width: var(--dsh-composer-card-max-width);
   min-width: 0;

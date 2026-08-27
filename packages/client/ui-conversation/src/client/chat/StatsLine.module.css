@@ -14,7 +14,7 @@
   flex: 0 1 auto;
   margin: 0;
   box-sizing: border-box;
-  padding: 4px calc(var(--dsh-composer-side-clearance) + 16px) 0px;
+  padding: 4px 0 0;
   font-size: 12px;
   line-height: 20px;
   color: var(--dsw-alias-label-tertiary);

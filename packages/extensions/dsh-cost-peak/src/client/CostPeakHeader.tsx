@@ -106,20 +106,20 @@ function formatTokens(value: number): string {
 
 const shell: CSSProperties = {
   display: 'inline-flex', alignItems: 'center', gap: 7,
-  minWidth: 0, color: 'var(--dsw-text-muted, #98a2b3)', whiteSpace: 'nowrap',
+  minWidth: 0, color: 'var(--dsw-alias-label-tertiary)',
+  fontSize: 12, lineHeight: '20px', whiteSpace: 'nowrap',
 }
 
 const mode: CSSProperties = {
-  fontSize: 11, fontWeight: 700, letterSpacing: '0.02em',
+  fontWeight: 600, letterSpacing: '0.02em',
 }
 
 const price: CSSProperties = {
-  fontSize: 13, fontWeight: 700, fontVariantNumeric: 'tabular-nums',
+  fontWeight: 600, fontVariantNumeric: 'tabular-nums',
 }
 
 const tokens: CSSProperties = {
-  fontSize: 10, color: 'var(--dsw-text-muted, #98a2b3)',
-  fontVariantNumeric: 'tabular-nums',
+  color: 'inherit', fontVariantNumeric: 'tabular-nums',
 }
 
 export function CostPeakHeader({ useProjection }: Props): ReactNode {
