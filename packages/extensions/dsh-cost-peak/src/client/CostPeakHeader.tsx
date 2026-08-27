@@ -115,12 +115,8 @@ const separator: CSSProperties = {
   color: 'var(--dsw-alias-separator-primary)', margin: '0 10px',
 }
 
-const mode: CSSProperties = {
-  fontWeight: 600, letterSpacing: '0.02em',
-}
-
 const peakMode: CSSProperties = {
-  ...mode, color: 'var(--dsw-static-amber-500)',
+  color: 'var(--dsw-static-amber-500)', fontWeight: 600, letterSpacing: '0.02em',
 }
 
 const price: CSSProperties = {
@@ -146,9 +142,11 @@ export function CostPeakHeader({ useProjection }: Props): ReactNode {
 
   return (
     <span style={shell} title="Estimated session cost; PEAK follows DeepSeek UTC schedule and is shown for Copenhagen users">
-      <span style={separator} aria-hidden="true">·</span>
-      <span style={peak ? peakMode : mode}>{peak ? 'PEAK' : 'OFF-PEAK'}</span>
-      {' '}
+      {peak && <>
+        <span style={separator} aria-hidden="true">·</span>
+        <span style={peakMode}>PEAK</span>
+        {' '}
+      </>}
       <span aria-label={`Estimated cost ${formatUsd(totalUsd(usage, peak))}`} style={price}>
         {formatUsd(totalUsd(usage, peak))}
       </span>
