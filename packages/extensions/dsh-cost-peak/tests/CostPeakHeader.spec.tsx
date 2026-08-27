@@ -1,7 +1,22 @@
 import { describe, expect, it } from 'vitest'
 import { formatCountdown, isPeakNow, nextTariffTransition } from '../src/client/CostPeakHeader.tsx'
+import type { SessionEvent } from '@deepseek-ai/dsh-session'
+import { costPeakProjectionDefinition } from '../src/pricing-projection.ts'
 
 const utc = (value: string) => new Date(`${value}Z`)
+
+function usageEvent(
+  type: 'assistant/chunk' | 'assistant/message',
+  time: string,
+  turn: number,
+  step: number,
+): SessionEvent {
+  const usage = { inputTokens: 1_000_000, outputTokens: 0 }
+  const data = type === 'assistant/chunk'
+    ? { turn, step, chunk: { type: 'usage', usage } }
+    : { turn, step, message: { role: 'assistant', content: [] }, usage }
+  return { type, time: utc(time).getTime(), data } as unknown as SessionEvent
+}
 
 describe('DeepSeek UTC tariff schedule', () => {
   it('finds the end of the current peak window', () => {
@@ -45,5 +60,15 @@ describe('DeepSeek UTC tariff schedule', () => {
 
     expect(nextTariffTransition(summer).at.toISOString()).toBe('2026-07-06T04:00:00.000Z')
     expect(nextTariffTransition(winter).at.toISOString()).toBe('2026-01-05T04:00:00.000Z')
+  })
+
+  it('keeps usage priced at the tariff when it arrived', () => {
+    let state = costPeakProjectionDefinition.init()
+    state = costPeakProjectionDefinition.apply(state, usageEvent('assistant/chunk', '2026-08-27T02:00:00', 1, 1))
+    // The final message repeats the same sample after the tariff changed; it must not reprice it.
+    state = costPeakProjectionDefinition.apply(state, usageEvent('assistant/message', '2026-08-27T05:00:00', 1, 1))
+    state = costPeakProjectionDefinition.apply(state, usageEvent('assistant/message', '2026-08-27T05:00:00', 2, 1))
+
+    expect(state.totalUsd).toBeCloseTo(0.66, 10)
   })
 })

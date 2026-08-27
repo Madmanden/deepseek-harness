@@ -1,6 +1,6 @@
 import { useEffect, useState, type CSSProperties, type ReactNode } from 'react'
 import type { PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
-import type { SessionProjectionMap } from '@deepseek-ai/dsh-client-runtime/client'
+import type {} from '@deepseek-ai/dsh-session-projection/types'
 
 type Props = PropsRuntime<'conversation.composer.dock'>
 
@@ -9,17 +9,6 @@ type Props = PropsRuntime<'conversation.composer.dock'>
  * Values are USD per 1M tokens. Keeping them in source makes the estimate
  * explicit until a settings screen is added.
  */
-const PRICING = {
-  // Official DeepSeek-V4-Flash off-peak prices, USD per 1M tokens.
-  // DeepSeek's peak rates are exactly 2x these values.
-  inputPerMillionUsd: 0.22,
-  outputPerMillionUsd: 0.66,
-  cacheReadPerMillionUsd: 0.007,
-  // DeepSeek's public table lists cache-hit and cache-miss input, not a
-  // separately billed cache-write bucket. DSH normally reports this as 0.
-  cacheWritePerMillionUsd: 0,
-} as const
-
 /** DeepSeek publishes peak windows in UTC, Monday through Friday. */
 const PEAK_WINDOWS_UTC = [
   { start: 1 * 60, end: 4 * 60 },
@@ -81,17 +70,6 @@ export function formatCountdown(now: Date, transition: TariffTransition): string
   return `${parts.duration} til ${parts.mode}`
 }
 
-function totalUsd(usage: SessionProjectionMap['tokenUsage'] | undefined, peak: boolean): number {
-  if (usage === undefined) return 0
-  const multiplier = peak ? 2 : 1
-  return multiplier * (
-    usage.uncachedInputTokens * PRICING.inputPerMillionUsd / 1_000_000
-      + usage.outputTokens * PRICING.outputPerMillionUsd / 1_000_000
-      + usage.cacheReadTokens * PRICING.cacheReadPerMillionUsd / 1_000_000
-      + usage.cacheWriteTokens * PRICING.cacheWritePerMillionUsd / 1_000_000
-  )
-}
-
 function formatUsd(value: number): string {
   return new Intl.NumberFormat('en-US', {
     style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 2,
@@ -130,6 +108,7 @@ const tokens: CSSProperties = {
 
 export function CostPeakHeader({ useProjection }: Props): ReactNode {
   const usage = useProjection('tokenUsage')
+  const accumulatedUsd = useProjection('costPeak') ?? 0
   const [now, setNow] = useState(() => new Date())
   useEffect(() => {
     const timer = window.setInterval(() => { setNow(new Date()) }, 30_000)
@@ -144,8 +123,8 @@ export function CostPeakHeader({ useProjection }: Props): ReactNode {
   return (
     <span style={shell} title="Estimated session cost; PEAK follows DeepSeek UTC schedule and is shown for Copenhagen users">
       <span style={separator} aria-hidden="true">·</span>
-      <span aria-label={`Estimated cost ${formatUsd(totalUsd(usage, peak))}`} style={peak ? peakPrice : price}>
-        {formatUsd(totalUsd(usage, peak))}
+      <span aria-label={`Estimated cost ${formatUsd(accumulatedUsd)}`} style={peak ? peakPrice : price}>
+        {formatUsd(accumulatedUsd)}
       </span>
       <span style={separator} aria-hidden="true">·</span>
       <span style={tokens}>

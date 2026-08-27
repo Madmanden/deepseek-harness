@@ -1,5 +1,9 @@
-/**
- * Host half. The cost widget is client-owned and reads the existing
- * tokenUsage projection; this empty host plugin makes the bundle loadable.
- */
-export function apply(): void {}
+import type { Context } from '@deepseek-ai/cordis'
+import { costPeakProjectionDefinition } from './pricing-projection.ts'
+
+/** The host projection is required to preserve historical tariff rates. */
+export const inject = ['sessionProjections']
+
+export function apply(ctx: Context): void {
+  ctx.sessionProjections.register(costPeakProjectionDefinition)
+}

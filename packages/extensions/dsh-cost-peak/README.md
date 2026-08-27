@@ -3,12 +3,11 @@
 Small local plugin for DeepSeek Harness. It adds a composer-footer utility with:
 
 - cumulative provider-reported token usage from DSH's existing `tokenUsage` projection
-- an estimated USD session cost
-- `PEAK` / `OFF-PEAK` based on DeepSeek's published Beijing windows, converted
-  automatically for Copenhagen users through timezone-aware formatting
-- a countdown to the next tariff transition from DeepSeek's UTC schedule
+- an estimated USD session cost that keeps each usage sample at its historical tariff
+- tariff colors and a countdown to the next change based on DeepSeek's UTC schedule
 
-During `PEAK`, the displayed estimate applies the 2x tariff multiplier.
+New usage during `PEAK` applies the 2x tariff multiplier; a later tariff change
+does not reprice usage that has already been accumulated.
 
 ## Install from this checkout
 
@@ -25,13 +24,11 @@ The local profile is stored under `$DSH_HOME/profiles/web` (in this environment,
 
 ## Configure
 
-Edit `src/client/CostPeakHeader.tsx`:
+Edit `src/pricing-projection.ts`:
 
-1. Change `PRICING` if you switch model. The current defaults are
-   DeepSeek-V4-Flash: `$0.0028/M` cache hit, `$0.14/M` cache miss, and
-   `$0.28/M` output.
-2. Change `PEAK_WINDOWS` only if DeepSeek changes its tariff windows.
-3. Rebuild with `pnpm --filter dsh-cost-peak bundle`.
+1. Change `PRICING` if you switch model.
+2. Change `peakWindowsUtc` only if DeepSeek changes its tariff windows.
+3. Rebuild with `pnpm run build` (or use the documented live workflow).
 
 The displayed price is an estimate when the provider's billing includes items
 that are not present in the session usage projection. The code intentionally
