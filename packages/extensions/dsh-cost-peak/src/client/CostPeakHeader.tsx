@@ -119,6 +119,10 @@ const mode: CSSProperties = {
   fontWeight: 600, letterSpacing: '0.02em',
 }
 
+const peakMode: CSSProperties = {
+  ...mode, color: 'var(--dsw-static-amber-500)',
+}
+
 const price: CSSProperties = {
   marginLeft: 4, fontWeight: 600, fontVariantNumeric: 'tabular-nums',
 }
@@ -143,7 +147,7 @@ export function CostPeakHeader({ useProjection }: Props): ReactNode {
   return (
     <span style={shell} title="Estimated session cost; PEAK follows DeepSeek UTC schedule and is shown for Copenhagen users">
       <span style={separator} aria-hidden="true">·</span>
-      <span style={mode}>{peak ? 'PEAK' : 'OFF-PEAK'}</span>
+      <span style={peak ? peakMode : mode}>{peak ? 'PEAK' : 'OFF-PEAK'}</span>
       {' '}
       <span aria-label={`Estimated cost ${formatUsd(totalUsd(usage, peak))}`} style={price}>
         {formatUsd(totalUsd(usage, peak))}
