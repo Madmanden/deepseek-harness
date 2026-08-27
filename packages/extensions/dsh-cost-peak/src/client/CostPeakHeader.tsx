@@ -9,7 +9,7 @@ type Props = PropsRuntime<'conversation.composer.dock'>
  * Values are USD per 1M tokens. Keeping them in source makes the estimate
  * explicit until a settings screen is added.
  */
-/** DeepSeek publishes peak windows in UTC and they apply every day. */
+/** DeepSeek publishes peak windows in UTC, Monday through Friday. */
 const PEAK_WINDOWS_UTC = [
   { start: 1 * 60, end: 4 * 60 },
   { start: 6 * 60, end: 10 * 60 },
@@ -20,8 +20,10 @@ type TariffTransition = Readonly<{
   mode: 'PEAK' | 'OFF-PEAK'
 }>
 
-/** Return whether a UTC instant falls inside one of the daily peak windows. */
+/** Return whether a UTC instant falls inside one of the weekday peak windows. */
 export function isPeakNow(now = new Date()): boolean {
+  const weekday = now.getUTCDay()
+  if (weekday === 0 || weekday === 6) return false
   const current = now.getUTCHours() * 60 + now.getUTCMinutes()
   return PEAK_WINDOWS_UTC.some(window => current >= window.start && current < window.end)
 }
@@ -37,6 +39,8 @@ export function nextTariffTransition(now = new Date()): TariffTransition {
   const dayMs = 24 * 60 * 60 * 1_000
   for (let dayOffset = 0; dayOffset <= 7; dayOffset += 1) {
     const dateStart = dayStart + dayOffset * dayMs
+    const weekday = new Date(dateStart).getUTCDay()
+    if (weekday === 0 || weekday === 6) continue
     for (const window of PEAK_WINDOWS_UTC) {
       candidates.push({ at: new Date(dateStart + window.start * 60 * 1_000), mode: 'PEAK' })
       candidates.push({ at: new Date(dateStart + window.end * 60 * 1_000), mode: 'OFF-PEAK' })

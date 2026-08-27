@@ -54,6 +54,8 @@ const peakWindowsUtc = [{ start: 60, end: 240 }, { start: 360, end: 600 }] as co
 
 function isPeakAt(time: number): boolean {
   const now = new Date(time)
+  const weekday = now.getUTCDay()
+  if (weekday === 0 || weekday === 6) return false
   const minute = now.getUTCHours() * 60 + now.getUTCMinutes()
   return peakWindowsUtc.some(window => minute >= window.start && minute < window.end)
 }

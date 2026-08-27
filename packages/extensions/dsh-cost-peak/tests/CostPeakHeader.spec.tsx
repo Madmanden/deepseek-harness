@@ -45,21 +45,21 @@ describe('DeepSeek UTC tariff schedule', () => {
     expect(formatCountdown(now, transition)).toBe('42m til PEAK')
   })
 
-  it('continues peak windows through the weekend', () => {
+  it('skips the weekend after Friday evening', () => {
     const now = utc('2026-08-28T10:30:00')
     const transition = nextTariffTransition(now)
 
     expect(isPeakNow(now)).toBe(false)
-    expect(transition.at.toISOString()).toBe('2026-08-29T01:00:00.000Z')
-    expect(formatCountdown(now, transition)).toBe('14t 30m til PEAK')
+    expect(transition.at.toISOString()).toBe('2026-08-31T01:00:00.000Z')
+    expect(formatCountdown(now, transition)).toBe('62t 30m til PEAK')
   })
 
-  it('counts weekend peak usage at the peak tariff', () => {
+  it('keeps weekend usage at the off-peak tariff', () => {
     let state = costPeakProjectionDefinition.init()
     state = costPeakProjectionDefinition.apply(state, usageEvent('assistant/message', '2026-08-29T01:30:00', 1, 1))
 
-    expect(isPeakNow(utc('2026-08-29T01:30:00'))).toBe(true)
-    expect(state.totalUsd).toBeCloseTo(0.44, 10)
+    expect(isPeakNow(utc('2026-08-29T01:30:00'))).toBe(false)
+    expect(state.totalUsd).toBeCloseTo(0.22, 10)
   })
 
   it('uses UTC rather than the local daylight-saving offset', () => {
