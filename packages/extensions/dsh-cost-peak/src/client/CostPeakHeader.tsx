@@ -124,6 +124,10 @@ const price: CSSProperties = {
   fontWeight: 600, fontVariantNumeric: 'tabular-nums',
 }
 
+const peakPrice: CSSProperties = {
+  ...price, color: 'var(--dsw-static-amber-500)',
+}
+
 const tokens: CSSProperties = {
   color: 'inherit', fontVariantNumeric: 'tabular-nums',
 }
@@ -148,7 +152,7 @@ export function CostPeakHeader({ useProjection }: Props): ReactNode {
         <span style={peakMode}>PEAK</span>
         {' '}
       </>}
-      <span aria-label={`Estimated cost ${formatUsd(totalUsd(usage, peak))}`} style={price}>
+      <span aria-label={`Estimated cost ${formatUsd(totalUsd(usage, peak))}`} style={peak ? peakPrice : price}>
         {formatUsd(totalUsd(usage, peak))}
       </span>
       <span style={separator} aria-hidden="true">·</span>
