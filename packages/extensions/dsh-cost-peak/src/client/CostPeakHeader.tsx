@@ -116,7 +116,7 @@ const separator: CSSProperties = {
 }
 
 const price: CSSProperties = {
-  marginLeft: 4, color: 'var(--dsw-alias-state-success-primary)',
+  color: 'var(--dsw-alias-state-success-primary)',
   fontWeight: 600, fontVariantNumeric: 'tabular-nums',
 }
 
