@@ -198,9 +198,7 @@ describe('StatsLine', () => {
   it('renders the grouped stats row and hides a brand-new empty session', () => {
     const { source } = makeSource({ nodes: [assistant(1, 1)] })
     const view = render(<StatsLine {...props(source)} />)
-    // No timing on the fixture: the duration group drops out whole. Tokens come
-    // from the projection, so paging the window cannot change them.
-    expect(view.container.textContent).toBe('1 turns · 1 steps| Cache hit 90%| Input 100 tok · Output 5 tok')
+    expect(view.container.textContent).toBe('1 turns · 1 steps· Cache hit 90%')
     const empty = makeSource()
     const emptyView = render(<StatsLine {...props(empty.source, {
       tokenUsage: { uncachedInputTokens: 0, outputTokens: 0, cacheReadTokens: 0, cacheWriteTokens: 0 },
@@ -245,7 +243,7 @@ describe('StatsLine', () => {
     expect(view.container.querySelector('[role="tooltip"]')).toBeNull()
     act(() => { vi.advanceTimersByTime(1) })
     expect(view.container.querySelector('[role="tooltip"]')?.textContent)
-      .toBe('1 turns · 1 steps | Cache hit 99.95% | Input 10K tok · Output 1 tok')
+      .toBe('1 turns · 1 steps · Cache hit 99.95%')
   })
 
   it('suppresses the tooltip while the row fits without truncation', () => {
@@ -257,14 +255,14 @@ describe('StatsLine', () => {
     expect(view.container.querySelector('[role="tooltip"]')).toBeNull()
   })
 
-  it('renders window latency and throughput beside the wall-time group', () => {
+  it('keeps the compact row when timing data is available', () => {
     const timed: AssistantMessageNode = {
       ...assistant(1, 1, { outputTokens: 60 }),
       timing: { stepStartTime: 1_000, firstTokenTime: 1_800, completedTime: 4_800 },
     }
     const { source } = makeSource({ nodes: [timed] })
     const view = render(<StatsLine {...props(source)} />)
-    expect(view.container.textContent).toContain('LLM 3.8s| TTFT avg 0.8s · 20 tok/s')
+    expect(view.container.textContent).toBe('1 turns · 1 steps· Cache hit 90%')
   })
 
   it('takes every stats label from the active locale', () => {
@@ -275,7 +273,7 @@ describe('StatsLine', () => {
     const { source } = makeSource({ nodes: [timed] })
     const view = render(<StatsLine {...props(source, { tokenUsage: tokenUsage(9_995, 5) })} t={t} />)
     expect(view.container.textContent)
-      .toBe('1 轮 · 1 步| LLM 3.8s| 首 token 平均 0.8s · 20 tok/s| 缓存命中 99.95%| 输入 10K tok · 输出 1 tok')
+      .toBe('1 轮 · 1 步· 缓存命中 99.95%')
   })
 
   it('renders without ResizeObserver support', () => {
@@ -284,15 +282,14 @@ describe('StatsLine', () => {
     expect(() => render(<StatsLine {...props(source)} />)).not.toThrow()
   })
 
-  it('keeps durable token groups after the visible step window is empty', () => {
+  it('keeps the cache-hit group after the visible step window is empty', () => {
     const { source } = makeSource()
     const view = render(<StatsLine {...props(source, {
       tokenUsage: USAGE,
       contextPressure: { pressureTokens: 32_000, contextWindow: 128_000 },
     })} />)
     // Context occupancy lives on the composer's ContextMeter ring, not here.
-    expect(view.container.textContent)
-      .toBe('Cache hit 90%| Input 100 tok · Output 5 tok')
+    expect(view.container.textContent).toBe('Cache hit 90%')
   })
 
   it('computes context occupancy only when both a numerator and capacity are known', () => {
@@ -328,7 +325,7 @@ describe('StatsLine', () => {
       sessionStats: sessionStats({ turns: 10, steps: 89 }),
     })} />)
     expect(view.container.textContent)
-      .toBe('10 turns · 89 steps| Cache hit 90%| Input 100 tok · Output 5 tok')
+      .toBe('10 turns · 89 steps· Cache hit 90%')
   })
 
   it('treats a defined zero-count projection as empty, not as fallback', () => {
@@ -362,13 +359,10 @@ describe('StatsLine', () => {
       sessionStats: sessionStats({ turns: 7, steps: 44 }),
     })} />)
     expect(view.container.textContent)
-      .toBe('7 turns · 44 steps| Cache hit 90%| Input 100 tok · Output 5 tok')
+      .toBe('7 turns · 44 steps· Cache hit 90%')
   })
 
-  it('renders whole-log wall times and speeds from the projection, not the loaded window', () => {
-    // The 加载更早 hazard beyond counts: LLM/tool durations and the TTFT and
-    // throughput figures must not grow per loaded page either. An untimed
-    // 1-node window renders the projection's whole-log figures verbatim.
+  it('renders whole-session counts from the projection, not the loaded window', () => {
     const { source } = makeSource({ nodes: [assistant(1, 1)] })
     const view = render(<StatsLine {...props(source, {
       tokenUsage: USAGE,
@@ -378,7 +372,7 @@ describe('StatsLine', () => {
       }),
     })} />)
     expect(view.container.textContent).toBe(
-      '200 turns · 200 steps| LLM 1m40s · Tool call 1m2s| TTFT avg 0.8s · 20 tok/s| Cache hit 90%| Input 100 tok · Output 5 tok',
+      '200 turns · 200 steps· Cache hit 90%',
     )
   })
 
@@ -387,7 +381,7 @@ describe('StatsLine', () => {
     const view = render(<StatsLine {...props(source, {
       tokenUsage: { uncachedInputTokens: 0, outputTokens: 7, cacheReadTokens: 0, cacheWriteTokens: 0 },
     })} />)
-    expect(view.container.textContent).toBe('1 turns · 1 steps| Input 0 tok · Output 7 tok')
+    expect(view.container.textContent).toBe('1 turns · 1 steps')
   })
 
   it('includes cache writes in billed input and the cache-hit denominator', () => {
@@ -401,7 +395,7 @@ describe('StatsLine', () => {
       },
     })} />)
     expect(view.container.textContent)
-      .toBe('1 turns · 1 steps| Cache hit 45%| Input 200 tok · Output 7 tok')
+      .toBe('1 turns · 1 steps· Cache hit 45%')
   })
 
   it('renders ZERO times during streaming chunk frames (RFC hard acceptance)', () => {

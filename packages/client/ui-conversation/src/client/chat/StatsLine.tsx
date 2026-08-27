@@ -10,7 +10,6 @@ import type { SnapshotSelectorHook } from '@deepseek-ai/dsh-client-ui-slots'
 import type {} from '@deepseek-ai/dsh-session-stats/client'
 import type { ContextPressureProjection, TokenUsageProjection } from '@deepseek-ai/dsh-token-meter/client'
 import type { ComposerBarProps } from '../contract/slots.ts'
-import { formatTokensPerSecond } from './message-chrome.ts'
 import { assistantStepReading } from './turn-metrics.ts'
 import css from './StatsLine.module.css'
 
@@ -217,24 +216,10 @@ export const StatsLine = memo(function StatsLine({ useSession, useProjection, t 
   // while no projection value is served.
   const projected = useProjection('sessionStats')
   const stats = useMemo(() => projected ?? deriveStats(settledNodes), [projected, settledNodes])
-  // Pipe-separated groups (figma stats strip); a group with no data drops out whole.
+  // The compact strip keeps only the session counts and cache-hit signal.
   const groups: string[] = []
   if (stats.steps > 0) {
     groups.push(t('stats.counts', { turns: stats.turns, steps: stats.steps }))
-    const durations: string[] = []
-    if (stats.llmMs > 0) durations.push(t('stats.llm', { duration: formatDuration(stats.llmMs) }))
-    if (stats.toolMs > 0) durations.push(t('stats.toolCall', { duration: formatDuration(stats.toolMs) }))
-    if (durations.length > 0) groups.push(durations.join(' · '))
-    const speeds: string[] = []
-    if (stats.ttftSteps > 0) {
-      speeds.push(t('stats.ttftAverage', { duration: formatDuration(stats.ttftMs / stats.ttftSteps) }))
-    }
-    if (stats.decodeMs > 0) {
-      speeds.push(t('stats.tokensPerSecond', {
-        throughput: formatTokensPerSecond(stats.decodeTokens / (stats.decodeMs / 1_000)),
-      }))
-    }
-    if (speeds.length > 0) groups.push(speeds.join(' · '))
   }
   // Context occupancy deliberately lives on the composer's ContextMeter ring,
   // not here — one home per fact.
@@ -246,12 +231,8 @@ export const StatsLine = memo(function StatsLine({ useSession, useProjection, t 
     && (billedInputTokens(usage) > 0 || usage.outputTokens > 0)) {
     const cacheHit = cacheHitPercent(usage)
     if (cacheHit !== null) groups.push(t('stats.cacheHit', { percent: cacheHit }))
-    groups.push(t('stats.tokens', {
-      input: formatTokens(billedInputTokens(usage)),
-      output: formatTokens(usage.outputTokens),
-    }))
   }
-  const line = groups.join(' | ')
+  const line = groups.join(' · ')
   // The row elides with ellipsis when overlong; a delayed hover tooltip carries
   // the full line, enabled only while content is actually clipped.
   const rootRef = useRef<HTMLDivElement | null>(null)
@@ -272,7 +253,7 @@ export const StatsLine = memo(function StatsLine({ useSession, useProjection, t 
       <div ref={rootRef} className={css.root}>
         {groups.map((group, i) => (
           <Fragment key={group}>
-            {i > 0 && <><span className={css.sep} aria-hidden>|</span>{' '}</>}
+            {i > 0 && <><span className={css.sep} aria-hidden>·</span>{' '}</>}
             <span>{group}</span>
           </Fragment>
         ))}
