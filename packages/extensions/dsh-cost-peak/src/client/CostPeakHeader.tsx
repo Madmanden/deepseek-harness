@@ -105,9 +105,13 @@ function formatTokens(value: number): string {
 }
 
 const shell: CSSProperties = {
-  display: 'inline-flex', alignItems: 'center', gap: 7,
+  display: 'inline-flex', alignItems: 'center', gap: 0,
   minWidth: 0, color: 'var(--dsw-alias-label-tertiary)',
   fontSize: 12, lineHeight: '20px', whiteSpace: 'nowrap',
+}
+
+const separator: CSSProperties = {
+  color: 'var(--dsw-alias-separator-primary)', margin: '0 10px',
 }
 
 const mode: CSSProperties = {
@@ -137,15 +141,16 @@ export function CostPeakHeader({ useProjection }: Props): ReactNode {
 
   return (
     <span style={shell} title="Estimated session cost; PEAK follows DeepSeek UTC schedule and is shown for Copenhagen users">
-      <span aria-hidden="true">·</span>
+      <span style={separator} aria-hidden="true">·</span>
       <span style={mode}>{peak ? 'PEAK' : 'OFF-PEAK'}</span>
       <span aria-label={`Estimated cost ${formatUsd(totalUsd(usage, peak))}`} style={price}>
         {formatUsd(totalUsd(usage, peak))}
       </span>
+      <span style={separator} aria-hidden="true">·</span>
       <span style={tokens}>
         <strong>{countdown.duration}</strong> til {countdown.mode}
       </span>
-      <span style={tokens} aria-hidden="true">·</span>
+      <span style={separator} aria-hidden="true">·</span>
       <span style={tokens}>
         <strong>{formatTokens(totalTokens)}</strong> tokens
       </span>
