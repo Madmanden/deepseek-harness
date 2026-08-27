@@ -107,3 +107,21 @@ git push origin master
 Hvis upstream har ændret de samme UI-filer som pluginet eller footer-tilpasningen, stopper merge med en konflikt. Løs konflikten, kør tests og build, og afslut derefter med `git add ...`, `git commit` og `git push origin master`. Pluginet bliver ikke automatisk overskrevet af filer, som upstream ikke ændrer.
 
 Efter en opdatering startes live-workflowet igen med `dsh-local --no-open`. Den lokale profil under `$DSH_HOME` peger på checkoutet og bygger derfor den version af Harness, der nu ligger i vores fork, sammen med pluginet.
+
+## Lad Codex synkronisere Harness
+
+Codex kan udføre hele opdateringen, når du beder den om at synkronisere vores fork med upstream. En passende instruktion er: `Hent nyeste upstream Harness, behold dsh-cost-peak, løs kun konflikter efter min godkendelse, kør relevante tests og build, og push til origin.`
+
+Codex skal følge denne rækkefølge:
+
+```sh
+git fetch upstream
+git merge upstream/master
+pnpm install
+pnpm run typecheck
+pnpm run build
+git diff --check
+git push origin master
+```
+
+Hvis merge giver konflikt, skal Codex stoppe og vise de berørte filer i stedet for at vælge upstream eller lokale ændringer automatisk. Hvis checks fejler, skal den reparere eller rapportere fejlen før push. Efter en succesfuld sync kan Codex starte eller kontrollere `dsh-local --no-open`, så den lokale UI bruger den opdaterede Harness og pluginet.
