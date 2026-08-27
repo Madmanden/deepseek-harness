@@ -100,7 +100,7 @@ function formatTokens(value: number): string {
 
 const shell = (peak: boolean): CSSProperties => ({
   display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 7,
-  minHeight: 30, padding: '1px 8px', borderRadius: 8,
+  minHeight: 30, padding: '2px 8px', borderRadius: 8,
   border: `1px solid ${peak ? 'rgba(245, 158, 11, 0.38)' : 'rgba(52, 211, 153, 0.26)'}`,
   background: peak ? 'rgba(245, 158, 11, 0.12)' : 'rgba(52, 211, 153, 0.08)',
   color: 'var(--dsw-text, #f2f4f7)', whiteSpace: 'nowrap',
