@@ -125,6 +125,10 @@ const tokens: CSSProperties = {
   fontVariantNumeric: 'tabular-nums',
 }
 
+const countdown: CSSProperties = {
+  flex: '0 0 100%', textAlign: 'right',
+}
+
 export function CostPeakHeader({ useProjection }: Props): ReactNode {
   const usage = useProjection('tokenUsage')
   const [now, setNow] = useState(() => new Date())
@@ -138,14 +142,14 @@ export function CostPeakHeader({ useProjection }: Props): ReactNode {
     : usage.uncachedInputTokens + usage.outputTokens + usage.cacheReadTokens + usage.cacheWriteTokens
 
   return (
-    <span style={shell(peak)} title="Estimated session cost; PEAK follows DeepSeek UTC schedule and is shown for Copenhagen users">
+    <span style={{ ...shell(peak), flexWrap: 'wrap' }} title="Estimated session cost; PEAK follows DeepSeek UTC schedule and is shown for Copenhagen users">
       <span style={dot(peak)} aria-hidden="true" />
       <span style={mode}>{peak ? 'PEAK' : 'OFF-PEAK'}</span>
       <span aria-label={`Estimated cost ${formatUsd(totalUsd(usage, peak))}`} style={price}>
         {formatUsd(totalUsd(usage, peak))}
       </span>
       <span style={tokens}>{formatTokens(totalTokens)} tokens</span>
-      <span style={tokens}>{formatCountdown(now, transition)}</span>
+      <span style={{ ...tokens, ...countdown }}>{formatCountdown(now, transition)}</span>
     </span>
   )
 }
