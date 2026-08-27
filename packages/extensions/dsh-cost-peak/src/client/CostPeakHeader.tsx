@@ -45,7 +45,9 @@ function totalUsd(usage: SessionProjectionMap['tokenUsage'] | undefined, peak: b
 }
 
 function formatUsd(value: number): string {
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 4 }).format(value)
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 2,
+  }).format(value)
 }
 
 function formatTokens(value: number): string {
