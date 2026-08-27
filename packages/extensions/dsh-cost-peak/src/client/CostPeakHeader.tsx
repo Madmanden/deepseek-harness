@@ -35,12 +35,15 @@ function isPeakNow(now = new Date()): boolean {
   return PEAK_WINDOWS.some(window => current >= window.start && current < window.end)
 }
 
-function totalUsd(usage: SessionProjectionMap['tokenUsage'] | undefined): number {
+function totalUsd(usage: SessionProjectionMap['tokenUsage'] | undefined, peak: boolean): number {
   if (usage === undefined) return 0
-  return usage.uncachedInputTokens * PRICING.inputPerMillionUsd / 1_000_000
-    + usage.outputTokens * PRICING.outputPerMillionUsd / 1_000_000
-    + usage.cacheReadTokens * PRICING.cacheReadPerMillionUsd / 1_000_000
-    + usage.cacheWriteTokens * PRICING.cacheWritePerMillionUsd / 1_000_000
+  const multiplier = peak ? 2 : 1
+  return multiplier * (
+    usage.uncachedInputTokens * PRICING.inputPerMillionUsd / 1_000_000
+      + usage.outputTokens * PRICING.outputPerMillionUsd / 1_000_000
+      + usage.cacheReadTokens * PRICING.cacheReadPerMillionUsd / 1_000_000
+      + usage.cacheWriteTokens * PRICING.cacheWritePerMillionUsd / 1_000_000
+  )
 }
 
 function formatUsd(value: number): string {
@@ -77,8 +80,8 @@ export function CostPeakHeader({ useProjection }: Props): ReactNode {
     <span style={shell} title="Estimated session cost; PEAK follows DeepSeek Beijing time and is shown for Copenhagen users">
       <span style={dot(peak)} aria-hidden="true" />
       <span>{peak ? 'PEAK' : 'OFF-PEAK'}</span>
-      <span aria-label={`Estimated cost ${formatUsd(totalUsd(usage))}`}>
-        {formatUsd(totalUsd(usage))} · {formatTokens(totalTokens)} tokens
+      <span aria-label={`Estimated cost ${formatUsd(totalUsd(usage, peak))}`}>
+        {formatUsd(totalUsd(usage, peak))} · {formatTokens(totalTokens)} tokens
       </span>
     </span>
   )

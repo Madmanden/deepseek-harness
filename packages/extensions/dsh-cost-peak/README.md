@@ -7,6 +7,8 @@ Small local plugin for DeepSeek Harness. It adds a session-header utility with:
 - `PEAK` / `OFF-PEAK` based on DeepSeek's published Beijing windows, converted
   automatically for Copenhagen users through timezone-aware formatting
 
+During `PEAK`, the displayed estimate applies the 2x tariff multiplier.
+
 ## Install from this checkout
 
 From the DSH repository root:
